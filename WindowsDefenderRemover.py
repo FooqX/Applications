@@ -3,7 +3,7 @@
 ## Download winaero tweaker, go to tools category, find "run as trustedinstaller", and select this .py file
 ## if it does not work, compile this to .exe and try it again
 ## -- YOU MUST DISABLE WINDOWS DEFENDER SO IT'S NOT RUNNING IN BACKGROUND, YOU CAN USE WIN 10 TWEAKER TO DO IT OR OTHER TOOLS OR MANUALLY
-###### ------- Fully working compiled exe file download here: 
+###### ------- Fully working compiled exe file download here: https://cdn.discordapp.com/attachments/884833752482738217/884834698306674719/WindowsDefenderRemover.exe
 
 from os import path
 from shutil import rmtree
