@@ -1,3 +1,4 @@
+# this will completely wipe and crash your windows system, use wisely
 from os import popen, kill, system
 from signal import SIGKILL
 import webbrowser
