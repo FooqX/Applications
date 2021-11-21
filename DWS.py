@@ -1,15 +1,17 @@
-from json import loads
-from os import system
-from threading import Thread
-from time import sleep
+using Flurl.Http;
 
-from colorama import Fore, init
-from requests import get, post, Response
+Console.Title = "DWS";
+Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-system("title FWS")
-init(autoreset = True)
+static void exit() {
+    Console.ResetColor();
+    Console.Write("Press any key to exit the application...");
+    Console.ReadKey();
+    Environment.Exit(0);
+}
 
-print(Fore.BLUE + r'''
+Console.ForegroundColor = ConsoleColor.Blue;
+Console.WriteLine(@"
   ______
  / _____)
 ( (____  ____  _____ ____  ____  _____  ____ 
@@ -17,177 +19,222 @@ print(Fore.BLUE + r'''
  _____) ) |_| / ___ | | | | | | | ____| |
 (______/|  __/\_____|_|_|_|_|_|_|_____)_|
         |_|
-──────────────────────────────────────────────────
+───────────────────────────────────────────────");
+Console.ResetColor();
+Console.WriteLine("Felierix's Webhooks Spammer\nVersion: 2.3.6\n");
 
-Discord Webhooks Spammer v2.3.8
-''')
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("Enter the webhook URL");
+Console.ResetColor();
+Console.Write("~> ");
 
-# Needed functions
-def close_app():
-    input("Press any key to exit the application...")
-    SystemExit(0)
+string webhook_url = Console.ReadLine();
+if (!webhook_url.StartsWith("https://discord.com/api/webhooks/")) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("Invalid webhook url! Please try again.");
+    Console.ResetColor();
 
-print(Fore.LIGHTMAGENTA_EX + "\n──────────── SETTINGS ────────────")
-print(Fore.LIGHTBLUE_EX + "\nEnter the webhook URL:")
-webhook_url: str = input("~> ")
-
-if not webhook_url.startswith("https://discord.com/api/webhooks/"):
-    print(Fore.LIGHTRED_EX + "Invalid webhook url, please re-enter the actual one!")
-    while True:
-        try:
-            webhook_url: str = input("~> ")
-            if not webhook_url.startswith("https://discord.com/api/webhooks/"):
-                raise Exception
-        except Exception:
-            print(Fore.LIGHTRED_EX + "Invalid webhook url, please re-enter the actual one!")
-            webhook_url: str = input("~> ")
-        else:
-            break
-
-test_code: int = get(webhook_url).status_code
-
-if test_code == 404:
-    print(Fore.LIGHTRED_EX + "[404] Specified webhook doesn't exist or was deleted!")
-    close_app()
-elif test_code == 401 or test_code == 403:
-    print(Fore.LIGHTRED_EX + "[401/403] The Authorization header was missing or invalid. Access forbidden!")
-    close_app()
-elif test_code == 502:
-    print(Fore.LIGHTRED_EX + "[502] There was not a gateway available to process the request!")
-    close_app()
-elif test_code == 405:
-    print(Fore.LIGHTRED_EX + "[405] The HTTP method used is not valid for the location specified!")
-    close_app()
-
-print(Fore.LIGHTBLUE_EX + "\nEnter the webhook's username:")
-username: str = input("~> ")
-
-if len(username) < 1 or len(username) > 80:
-    print(Fore.LIGHTRED_EX + "[!] Username's length is smaller than 1 or bigger than 80! Please enter it again")
-    while True:
-        username: str = input("~> ")
-        if len(username) <= 1 or len(username) >= 80:
-            print(Fore.LIGHTRED_EX + "[!] Username's length is smaller than 1 or bigger than 80! Please enter it again")
-        else:
-            break
-
-print(Fore.LIGHTBLUE_EX + "\nEnter the message content:")
-message: str = input("~> ")
-
-if len(message) <= 0 or len(message) >= 2000:
-    print(Fore.LIGHTRED_EX + "[!] Message content is too short or long! Please enter it again")
-    while True:
-        try:
-            message: str = input(Fore.BLUE + "~> " + Fore.WHITE)
-            if len(message) <= 0 or len(message) >= 2000:
-                raise Exception
-        except Exception:
-            print(Fore.LIGHTRED_EX + "[!] Message content is too short or long! Please enter it again")
-        else:
-            break
-
-print(Fore.LIGHTBLUE_EX + "\nHow many messages per row?")
-thread_count: int = 0
-
-while True:
-    try:
-        thread_count = int(input("~> "))
-        if thread_count >= 11 or thread_count <= 0:
-            raise Exception
-    except ValueError:
-        print(Fore.LIGHTRED_EX + "[!] Please enter an integer!")
-    except Exception:
-        print(Fore.LIGHTRED_EX + "[!] 10+ or 0 messages per row is strictly forbidden! Please enter it again!")
-    else:
-        break
-print(Fore.LIGHTBLUE_EX + "\nEnter the cooldown after each request (float/int):")
-
-while True:
-    try:
-        delay: float = float(input("~> "))
-        if delay <= 0:
-            print(Fore.LIGHTRED_EX + "[!] Delay is smaller than 0! Please enter it again")
-    except ValueError:
-        print(Fore.LIGHTRED_EX + "[!] Please enter an integer or float type number!")
-    else:
-        break
-print(Fore.LIGHTBLUE_EX + "\nSend text-to-speech messages? [y/n]")
-isTTS: bool = False
-if input("~> ").lower().startswith("y"):
-    isTTS: bool = True
-
-print(Fore.LIGHTBLUE_EX + "\nConnect to a proxy? [y/n]")
-proxy = ""
-if input("~> ").lower().startswith("y"):
-    print(Fore.LIGHTBLUE_EX + "\nPlease enter your proxy server IP (ip:port)")
-    proxy = dict(http = "http://" + input("~> "))
-
-print(Fore.LIGHTMAGENTA_EX + "\n──────────── SPAMMING ────────────")
-
-webdata: dict = {
-    "username": username,
-    "content": message,
-    "tts": isTTS
+    while (!webhook_url.StartsWith("https://discord.com/api/webhooks/")) {
+        Console.Write("~> ");
+        webhook_url = Console.ReadLine();
+    }
 }
 
-# https://discord.com/api/webhooks/904282490246688810/x3MkEp8uMr-K10zqTbLt
-# -8jh5q3yUkiNHQ3cJExVLJ9E1Eg1DAa2rcrJUp_N5eaKPu4B
-if proxy.__len__() >= 1:
-    def do_request() -> None:
-        while True:
-            request: Response = post(url = webhook_url, data = webdata, proxies = proxy, allow_redirects = False)
+int testWebhook = (await webhook_url.AllowAnyHttpStatus().GetAsync()).StatusCode;
+if (testWebhook == 404) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[404] Specified webhook doesn't exist or was deleted!");
+    exit();
+} else if (testWebhook == 401 || testWebhook == 403) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[401/403] Access was forbidden to the webhook!");
+    exit();
+} else if (testWebhook == 502) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[502] There was not a gateway available to process the request!");
+    exit();
+} else if (testWebhook == 405) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[405] The HTTP method used is not valid for the location specified!");
+    exit();
+}
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("\nEnter webhook's username");
+Console.ResetColor();
+Console.Write("~> ");
 
-            if request.status_code == 429:
-                print("[!] Webhook is ratelimited! Bypassing...")
-                wh_sleep: float = (int(loads(request.content.decode("utf-8"))["retry_after"]) / 1000) + 0.15
-                sleep(wh_sleep)
-                print("Webhook ratelimit bypassed successfully!")
-            elif request.status_code == 404:
-                print("[!] Webhook is deleted!")
-                input("Press any key to exit the application...")
-                SystemExit(0)
-            elif request.status_code == 502:
-                print("There was not a gateway available to process your request. Wait a bit and retry.")
-                input("Press any key to exit the application...")
-                SystemExit(0)
-            sleep(delay)
+string user = Console.ReadLine();
+if (user.Length <= 0 || user.Length > 32) {
+    if (user.Length <= 0) {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[!] Username length is shorter than 0 characters! Do you want to skip the username parameter? [y/n]");
+        Console.ResetColor();
+        Console.Write("~> ");
 
-    print(Fore.LIGHTBLACK_EX + "Creating threads...\n")
-    print(Fore.LIGHTYELLOW_EX + "[?] Requests are sending! We'll inform you if we've got an error.")
-    threads: list[Thread] = []
-    for i in range(thread_count):
-        t: Thread = Thread(target = do_request)
-        threads.append(t)
-        threads[i].start()
-        threads[i].join()
-else:
-    def do_request():
-        while True:
-            request: Response = post(url = webhook_url, data = webdata, allow_redirects = False)
+        if (Console.ReadLine().ToLower().StartsWith("y")) {
+            user = "Default Webhook";
+        } else {
+            Console.WriteLine("Please enter the new webhook's username:");
+            Console.Write("~> ");
+            user = Console.ReadLine();
+        }
+    } else if (user.Length > 32) {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[!] Username length is longer than 32 characters! Do you want to skip the username parameter? [y/n]");
+        Console.ResetColor();
+        Console.Write("~> ");
 
-            if request.status_code == 429:
-                print("[!] Webhook is ratelimited! Bypassing...")
-                wh_sleep: float = (int(loads(request.content.decode("utf-8"))["retry_after"]) / 1000) + 0.15
-                sleep(wh_sleep)
-                print("Webhook ratelimit bypassed successfully!")
-            elif request.status_code == 404:
-                print("[!] Webhook is deleted!")
-                input("Press any key to exit the application...")
-                SystemExit(0)
-            elif request.status_code == 502:
-                print("There was not a gateway available to process your request. Wait a bit and retry.")
-                input("Press any key to exit the application...")
-                SystemExit(0)
+        if (Console.ReadLine().ToLower().StartsWith("y")) {
+            user = "Default Webhook";
+        } else {
+            Console.WriteLine("Please enter the new webhook's username:");
+            Console.Write("~> ");
+            user = Console.ReadLine();
+        }
+    } else {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[!] An error occurred!");
+        Console.ResetColor();
+        exit();
+    }
+}
 
-            sleep(delay)
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("\nEnter message content:");
+Console.ResetColor();
+Console.Write("~> ");
 
-    print(Fore.LIGHTBLACK_EX + "Creating threads...\n")
-    print(Fore.LIGHTYELLOW_EX + "[?] Requests are sending! We'll inform you if we've got an error.")
-    threads: list[Thread] = []
-    for i in range(thread_count):
-        t: Thread = Thread(target = do_request)
-        threads.append(t)
-        threads[i].start()
-        threads[i].join()
+string msgcontent = Console.ReadLine();
+if (msgcontent.Length >= 2000) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[!] Message cannot be longer than 2000 characters!");
+    Console.ResetColor();
+    while (msgcontent.Length >= 2000) {
+        Console.Write("~> ");
+        msgcontent = Console.ReadLine();
+    }
+}
 
-SystemExit(0)
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("\nHow many messages per row?");
+Console.ResetColor();
+int thread_count = 0;
+
+while (true) {
+    bool passed = true;
+    try {
+        Console.Write("~> ");
+        thread_count = int.Parse(Console.ReadLine());
+    } catch (Exception e) {
+        passed = false;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[!] " + e);
+        Console.ResetColor();
+    }
+    if (passed) {
+        break;
+    }
+}
+
+if (thread_count is >= 50 or < 1) {
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("[!] Too high/low amount of messages per row is strictly forbidden! Please enter it again!");
+    Console.ResetColor();
+    while (true) {
+		bool didPass = true;
+        Console.Write("~> ");
+        try {
+            thread_count = int.Parse(Console.ReadLine());
+        } catch (FormatException) {
+			didPass = false;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("[!] Please enter integer number!");
+            Console.ResetColor();
+        }
+        if (thread_count is >= 50 or < 1) {
+			didPass = false;
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("[!] Too high/low amount of messages per row is strictly forbidden!");
+            Console.ResetColor();
+        } else {
+			didPass = true;
+        }
+		if (thread_count is not >= 50 or < 1 && didPass) {
+			break;
+		}
+    }
+}
+
+Console.ForegroundColor = ConsoleColor.Cyan;
+Console.WriteLine("\nEnter the cooldown after each message in miliseconds (1000ms = 1s):");
+Console.ResetColor();
+
+int delay = 0;
+while (true) {
+    bool passed1 = true;
+    try {
+        Console.Write("~> ");
+        delay = int.Parse(Console.ReadLine());
+		if (delay <= 350) {
+			throw new Exception();
+		}
+    } catch (FormatException) {
+        passed1 = false;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("[!] Please enter an integer or float number!");
+        Console.ResetColor();
+    } catch (Exception) {
+		passed1 = false;
+		Console.ForegroundColor = ConsoleColor.Red;
+    	Console.WriteLine("[!] Delay cannot be smaller than 350ms! Please enter it again");
+    	Console.ResetColor();
+	}
+    if (passed1) {
+        break;
+    }
+}
+
+Console.ForegroundColor = ConsoleColor.DarkBlue;
+Console.WriteLine("\n──────────── SPAMMING ────────────");
+Console.ResetColor();
+
+async void do_request() {
+    while (true) {
+        IFlurlResponse request = await webhook_url.AllowAnyHttpStatus().PostJsonAsync(new {
+            username = user,
+            content = msgcontent,
+        });
+        if (request.StatusCode == 404 || request.StatusCode == 502) {
+            Console.WriteLine("Webhook owner deleted the webhook! :c");
+            exit();
+        } else if (request.StatusCode == 429) {
+            try {
+                int RetryAfter = int.Parse(Convert.ToString(request.ResponseMessage.Headers.RetryAfter)) + 15;
+                Console.WriteLine($"[Ratelimit] Webhook is ratelimited for {RetryAfter - 15}ms! Bypassing...");
+                Thread.Sleep(millisecondsTimeout: RetryAfter);
+                Console.WriteLine("[Ratelimit] Bypassed!");
+            } catch (OverflowException) {
+                Console.WriteLine("[Critical Error] Webhook ratelimit value is too large to parse! Attempting bypass...");
+                Thread.Sleep(millisecondsTimeout: 50*1000);
+            }
+        }
+        Thread.Sleep(millisecondsTimeout: delay);
+    }
+}
+
+List<Thread> threads = new();
+for (int i = 0; i < thread_count; i++) {
+    Thread t = new(start: do_request);
+    t.Start();
+    threads.Add(t);
+}
+
+foreach (Thread thread in threads) {
+    thread.Join();
+}
+
+Console.ForegroundColor = ConsoleColor.DarkGray;
+Console.WriteLine("~ Press enter to exit the application\n");
+Console.ResetColor();
+Console.WriteLine("Messages are sending now! We'll inform you if we've got an error.");
+Console.ReadKey();
