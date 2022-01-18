@@ -8,7 +8,6 @@ int main() {
     unsigned int carCount;
     cin >> carCount;
 
-    // If integer was not passed
     if(cin.fail()) {
         cout << "\nError: Failed to get integer from input.\n";
         cin.clear();
