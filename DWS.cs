@@ -11,17 +11,9 @@ static void exit() {
 }
 
 Console.ForegroundColor = ConsoleColor.Blue;
-Console.WriteLine(@"
-  ______
- / _____)
-( (____  ____  _____ ____  ____  _____  ____ 
- \____ \|  _ \(____ |    \|    \| ___ |/ ___)
- _____) ) |_| / ___ | | | | | | | ____| |
-(______/|  __/\_____|_|_|_|_|_|_|_____)_|
-        |_|
-───────────────────────────────────────────────");
+
 Console.ResetColor();
-Console.WriteLine("Felierix's Webhooks Spammer\nVersion: 2.3.6\n");
+Console.WriteLine("Experimental Discord Webhook Spammer\nVersion: 2.3.6\n");
 
 Console.ForegroundColor = ConsoleColor.Cyan;
 Console.WriteLine("Enter the webhook URL");
@@ -67,7 +59,7 @@ string user = Console.ReadLine();
 if (user.Length <= 0 || user.Length > 32) {
     if (user.Length <= 0) {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("[!] Username length is shorter than 0 characters! Do you want to skip the username parameter? [y/n]");
+        Console.WriteLine("[!] Username length is 0 characters! Do you want to skip the username parameter? [y/n]");
         Console.ResetColor();
         Console.Write("~> ");
 
